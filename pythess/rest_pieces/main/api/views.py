@@ -1,18 +1,18 @@
-from rest_framework import viewsets
-
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from ..models import University, Student
 from .permissions import IsAuthenticatedOrReadOnly
 from .serializers import UniversitySerializer, StudentSerializer
 
 
-class StudentViewSet(viewsets.ModelViewSet):
+class StudentViewSet(NestedViewSetMixin, ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
-class UniversityViewSet(viewsets.ModelViewSet):
+class UniversityViewSet(NestedViewSetMixin, ModelViewSet):
     queryset = University.objects.all()
     serializer_class = UniversitySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
