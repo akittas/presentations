@@ -4,3 +4,4 @@ Thumbs.db
 __pycache__/
 .env/
 .idea/
+*.sqlite3
