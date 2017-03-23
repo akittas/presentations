@@ -1,6 +1,6 @@
 from rest_framework_extensions.routers import ExtendedDefaultRouter
 
-from .api import views
+from main.api import views
 
 router = ExtendedDefaultRouter()
 router.register(r'students', views.StudentViewSet)
