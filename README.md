@@ -4,7 +4,7 @@ This is a repository of my presentations on several Python topics in local meetu
 
 1. **The Tao of Python**: The intricate relationship between `object` and `type` and how metaclasses, classes and instances are related ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/tao_mro/tao_of_python.ipynb)). 
 2. **MRO in Python**: Method resolution order in multiple inheritance using C3 linearization ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/tao_mro/case_mro.ipynb)).
-3. **Metaclasses and Metaprogramming** in Python ([link](https://github.com/akittas/presentations/blob/master/pythess/meta_alltheway/meta_alltheway.ipynb)).
+3. **Metaclasses and Metaprogramming** in Python ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/meta_alltheway/meta_alltheway.ipynb)).
 4. **Functional Programming** in Python: Decorators, Generators, Iterators ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/func_py/func_py.ipynb)).
 5. **Descriptors**: The magic behind attribute access in Python ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/descriptors/descriptors.ipynb)).
 6. How to **speedup Python** with `cython` ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/intro_cython/intro_cython.ipynb)).
