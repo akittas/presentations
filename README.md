@@ -11,3 +11,4 @@ This is a repository of my presentations on several Python topics in local meetu
 7. How to **speedup Python**, without bothering too much, with `numba` ([link](https://nbviewer.jupyter.org/github/akittas/presentations/blob/master/pythess/numba/numba.ipynb)).
 8. How to **make a REST API** using `django` and `django-rest-framework` ([project](https://github.com/akittas/presentations/tree/master/pythess/rest_pieces) and [slides](https://docs.google.com/presentation/d/1GCUIj3mSv80E9Mhv91fRVcZQRAndqfHSt_Yahnx08mw/edit?usp=sharing)).
 9. How to **use websockets** in `django` with `channels` ([slides](https://docs.google.com/presentation/d/16CdeWkfkUPlzcFYlLc9qoaYiMXn1f92or9RnFgBwh54/edit?usp=sharing)).
+10. Notes on Git (based on the official Git docs, Pro Git book and the Atlassian Git tutorial) ([link](https://github.com/akittas/presentations/blob/master/notes/notes_on_git.md)).
