@@ -9,14 +9,20 @@ Git **objects** are the actual data of Git, the main thing that the repository i
 There are four object types in Git:
 
 1. **Blob**. In Git, the contents of files are stored as **blobs**. It is important to note that it is the *contents* that are stored, not the files. The names and modes of the files are not stored with the blob, just the contents. Therefore a blob object is nothing but a chunk of binary data. It doesn't refer to anything else or have attributes of any kind, not even a file name.
-   ![](https://i.imgur.com/U8PkBvd.png)
+
+![](https://i.imgur.com/U8PkBvd.png)
+
 2. **Tree**. Directories in Git basically correspond to **trees**. A tree is a simple list of trees and blobs that the tree contains, along with the names and modes of those trees and blobs. The contents section of a tree object consists of a simple text file that lists the: i) *mode*, ii) *type*, iii) *name* and iv) *SHA* of each entry.
-   ![](https://i.imgur.com/Sa5cA9i.png)
+
+![](https://i.imgur.com/Sa5cA9i.png)
+
 3. **Commit**. The **commit** object is very simple, much like the tree. It simply points to a tree and keeps: i) *tree* ii) *author*, iii) *committer*, iv) *message* and v) any *parent commits* that directly preceded it. Most times a commit will only have a single parent but e.g. if you merge two branches, the next commit will point to both of them.
-   ![](https://i.imgur.com/dgbdfRB.png)
-4. **Tag (annotated)**. The annotated **tag** is an object that provides a permanent shorthand name for a particular commit. It contains an i) *object*, ii) *type*, iii) *tag name*, iv) *tagger* and v) *message*. Normally the type is commit and the object is the SHA-1 of the commit you 're tagging. This tag can also be GPG signed, providing cryptographic integrity to a release or version.
-    Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
-   ![](https://i.imgur.com/brljv1N.png)
+
+![](https://i.imgur.com/dgbdfRB.png)
+
+4. **Tag (annotated)**. The annotated **tag** is an object that provides a permanent shorthand name for a particular commit. It contains an i) *object*, ii) *type*, iii) *tag name*, iv) *tagger* and v) *message*. Normally the type is commit and the object is the SHA-1 of the commit you 're tagging. This tag can also be GPG signed, providing cryptographic integrity to a release or version. Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
+
+![](https://i.imgur.com/brljv1N.png)
 
 ## Git References
 
@@ -1304,9 +1310,15 @@ Some of the most common local and server-side hooks let us plug in to the entire
 ## References
 
 <a id="1">[1]</a> [S. Chacon - Git Internals](https://github.com/pluralsight/git-internals-pdf) (2008)
+
 <a id="2">[2]</a> [S. Chacon - The Git Community Book](https://shafiul.github.io/gitbook)
+
 <a id="3">[3]</a> [S. Chacon & B. Straub - Pro Git](https://git-scm.com/book/en/v2)
+
 <a id="4">[4]</a> [Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials)
+
 <a id="5">[5]</a> [Git Official Documentation](https://git-scm.com/docs)
+
 <a id="6">[6]</a> [StackOverflow - What does tree-ish mean in Git?](https://stackoverflow.com/questions/4044368/what-does-tree-ish-mean-in-git)
+
 <a id="7">[7]</a> [Dr. Dobbs - Three-Way Merging: A Look Under the Hood](https://www.drdobbs.com/tools/three-way-merging-a-look-under-the-hood/240164902)
