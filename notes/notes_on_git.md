@@ -1,8 +1,4 @@
-Notes on Git
-
 # Notes on Git
-
-[toc]
 
 # Git Internals
 
@@ -13,13 +9,13 @@ Git **objects** are the actual data of Git, the main thing that the repository i
 There are four object types in Git:
 
 1. **Blob**. In Git, the contents of files are stored as **blobs**. It is important to note that it is the *contents* that are stored, not the files. The names and modes of the files are not stored with the blob, just the contents. Therefore a blob object is nothing but a chunk of binary data. It doesn't refer to anything else or have attributes of any kind, not even a file name.
-	![](https://i.imgur.com/U8PkBvd.png)
+   ![](https://i.imgur.com/U8PkBvd.png)
 2. **Tree**. Directories in Git basically correspond to **trees**. A tree is a simple list of trees and blobs that the tree contains, along with the names and modes of those trees and blobs. The contents section of a tree object consists of a simple text file that lists the: i) *mode*, ii) *type*, iii) *name* and iv) *SHA* of each entry.
-	![](https://i.imgur.com/Sa5cA9i.png)
+   ![](https://i.imgur.com/Sa5cA9i.png)
 3. **Commit**. The **commit** object is very simple, much like the tree. It simply points to a tree and keeps: i) *tree* ii) *author*, iii) *committer*, iv) *message* and v) any *parent commits* that directly preceded it. Most times a commit will only have a single parent but e.g. if you merge two branches, the next commit will point to both of them.
-	![](https://i.imgur.com/dgbdfRB.png)
+   ![](https://i.imgur.com/dgbdfRB.png)
 4. **Tag (annotated)**. The annotated **tag** is an object that provides a permanent shorthand name for a particular commit. It contains an i) *object*, ii) *type*, iii) *tag name*, iv) *tagger* and v) *message*. Normally the type is commit and the object is the SHA-1 of the commit you 're tagging. This tag can also be GPG signed, providing cryptographic integrity to a release or version.
-	Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
+    Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
    ![](https://i.imgur.com/brljv1N.png)
 
 ## Git References
@@ -32,11 +28,11 @@ There are three reference types in Git:
 
 1. **Branch**. A **branch** in Git is nothing more than a file in the `.git/refs/heads/` directory that contains the SHA-1 of the most recent commit of that branch. That's basically what a branch in Git is: a simple pointer or reference to the head of a line of work. To branch that line of development, all Git does is create a new file in that directory that points to the same SHA-1. As you continue to commit, one of the branches will keep changing to point to the new commit SHA-1, while the other one can stay where it was.
 2. **Tag (lightweight)**. We can also create a tag that doesn't actually add a tag object to the database, but just creates a reference to it in the `.git/refs/tags` directory. That is all a lightweight tag is - a reference that never moves.
-	Note that *annotated* tags are meant for release while *lightweight* tags are meant for private or temporary object labels.
+    Note that *annotated* tags are meant for release while *lightweight* tags are meant for private or temporary object labels.
 3. **Remote reference**. A Git **remote** is a repository that contains the same project as you are working on in your local one, but at a different location. A remote is thus nickname for an external repository that you want to interact with and `origin` is the name Git gives to the original repository when you make a copy of (clone) it. Collaborating with others involves managing these remote repositories and pushing and pulling data to and from them when you need to share work.
-	**Remote references** are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with `git ls-remote <remote>`, or `git remote show <remote>` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
-	**Remote-tracking branches** are local references to the state of remote branches. You can't move them; Git moves them for you whenever you do any network communication, to make sure they accurately represent the state of the remote repository. Think of them as bookmarks, to remind you where the branches in your remote repositories were the last time you connected to them. Remote-tracking branch names take the form `<remote>/<branch>`. For instance, if you wanted to see what the master branch on your origin remote looked like as of the last time you communicated with it, you would check the `origin/master` branch.
-	Remote-tracking branches differ from branches (`refs/heads` references) mainly in that they're considered read-only. You can `git checkout` to one, but Git won't point HEAD at one, so you'll never update it with a commit command. Git manages them as bookmarks to the last known state of where those branches were on those servers.
+    **Remote references** are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with `git ls-remote <remote>`, or `git remote show <remote>` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
+    **Remote-tracking branches** are local references to the state of remote branches. You can't move them; Git moves them for you whenever you do any network communication, to make sure they accurately represent the state of the remote repository. Think of them as bookmarks, to remind you where the branches in your remote repositories were the last time you connected to them. Remote-tracking branch names take the form `<remote>/<branch>`. For instance, if you wanted to see what the master branch on your origin remote looked like as of the last time you communicated with it, you would check the `origin/master` branch.
+    Remote-tracking branches differ from branches (`refs/heads` references) mainly in that they're considered read-only. You can `git checkout` to one, but Git won't point HEAD at one, so you'll never update it with a commit command. Git manages them as bookmarks to the last known state of where those branches were on those servers.
 
 ### Special Refs
 
@@ -120,7 +116,7 @@ History traversing commands such as `git log` operate on a set of commits, not j
 | 4. `<rev1>...<rev2>`                      | Include commits that are reachable from either `<rev1>` or `<rev2>` but exclude those that are reachable from both. When either `<rev1>` or `<rev2>` is omitted, it defaults to `HEAD`. |
 | 5. `<rev>^@`, e.g. `HEAD^@`               | A suffix `^` followed by an at sign is the same as listing all parents of `<rev>` (meaning, include anything reachable from its parents, but not the commit itself).                    |
 | 6. `<rev>^!`, e.g. `HEAD^!`               | A suffix `^` followed by an exclamation mark is the same as giving commit `<rev>` and then all its parents prefixed with `^` to exclude them (and their ancestors).                     |
-| 7. `<rev>^-<n>`, e.g. `HEAD^-`, `HEAD^-2` | Equivalent to `<rev>^<n>..<rev>`, with `<n> = 1` if not given.                                                                                          
+| 7. `<rev>^-<n>`, e.g. `HEAD^-`, `HEAD^-2` | Equivalent to `<rev>^<n>..<rev>`, with `<n> = 1` if not given.                                                                                                                          |
 
 ## The Reflog
 
@@ -185,7 +181,6 @@ Initialize an empty Git repository, but omit the working directory. This is call
 
 The `--bare` flag creates a repository that doesn't have a working directory, making it impossible to edit files and commit changes in that repository. You would create a bare repository to `git push` and `git pull` from, but never directly commit to it. Central repositories should always be created as bare repositories because pushing branches to a non-bare repository has the potential to overwrite changes. Think of `--bare` as a way to mark a repository as a storage facility, as opposed to a development environment. This means that for virtually all Git workflows, the central repository is bare, and developers local repositories are non-bare.
 
-
 ### `git clone`
 
 `git clone` is primarily used to point to an existing repo and make a clone or copy of that repo at in a new directory, at another location. The original repository can be located on the local filesystem or on remote machine accessible supported protocols. This command lones a repository into a newly created directory, creates remote-tracking branches for each branch in the cloned repository (visible using `git branch --remotes`), and creates and checks out an initial branch that is forked from the cloned repository's currently active branch.
@@ -209,7 +204,6 @@ Clone `repo` into the specified `<directory>`.
 - `--bare`: Similar to `git init --bare`, a copy of the remote repository will be made with an omitted working directory. This means that a repository will be set up with the history of the project that can be pushed and pulled from, but cannot be edited directly. In addition, no remote branches for the repo will be configured with the bare repository. Like `git init --bare`, this is used to create a hosted repository that developers will not edit directly.
 - `--mirror`: Passing the `--mirro`r argument implicitly passes the `--bare` argument as well, resulting in a bare repo with no editable working files. In addition, `--mirror` will clone all the extended refs of the remote repository, and maintain remote branch tracking configuration. You can then run `git remote updat`e on the mirror and it will overwrite all refs from the origin repo, giving you exact 'mirrored' functionality.
 - `-o <name>, --origin <name>`: Instead of using the remote name origin to keep track of the upstream repository, use `<name>`.
-
 
 ## Saving Changes
 
@@ -628,7 +622,6 @@ In this case there is not a linear path from the current branch to the target br
 
 A **2-way merge** or **fast-forward** merge can occur when there is a linear path from the current branch tip to the target branch. Instead of "actually" merging the branches, all Git has to do to integrate the histories is move (i.e., "fast forward") the current branch tip up to the target branch tip. This is the most common case especially when invoked from `git pull`: you are tracking an upstream repository, you have committed no local changes, and now you want to update to a newer upstream revision. This effectively combines the histories, since all of the commits reachable from the target branch are now available through the current one. For example, a fast forward merge of `feature` into `master` using `git merge feature` when on `master` as current branch, would look something like:
 
-
 ![](https://i.imgur.com/GvjzB7N.png)
 
 However, a fast-forward merge is not possible if the branches have diverged. When there is not a linear path to the target branch, Git has no choice but to combine them via a 3-way merge.
@@ -843,6 +836,7 @@ A range of commits could also be removed with rebase. If we have the following s
 ```
     E---F---G---H---I---J  topicA
 ```
+
 then the command
 
 ```bash
@@ -1253,7 +1247,7 @@ $ git flow hotfix finish hotfix_branch
 ### Gitflow Summary
 
 The overall flow of Gitflow is:
- 
+
 1. A `develop` branch is created from `master`.
 2. A `release` branch is created from `develop`.
 3. `feature` branches are created from `develop`.
