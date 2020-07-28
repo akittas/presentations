@@ -24,6 +24,7 @@ There are four object types in Git:
 
 ![](https://i.imgur.com/brljv1N.png)
 
+
 ## Git References
 
 The most direct way to reference a commit is via its **SHA-1** hash. This acts as the unique ID for each commit. It's sometimes necessary to resolve a branch, tag, or another indirect reference into the corresponding commit hash. For this, you can use the `git rev-parse` command.
@@ -34,17 +35,17 @@ There are three reference types in Git:
 
 1. **Branch**. A **branch** in Git is nothing more than a file in the `.git/refs/heads/` directory that contains the SHA-1 of the most recent commit of that branch. That's basically what a branch in Git is: a simple pointer or reference to the head of a line of work. To branch that line of development, all Git does is create a new file in that directory that points to the same SHA-1. As you continue to commit, one of the branches will keep changing to point to the new commit SHA-1, while the other one can stay where it was.
 2. **Tag (lightweight)**. We can also create a tag that doesn't actually add a tag object to the database, but just creates a reference to it in the `.git/refs/tags` directory. That is all a lightweight tag is - a reference that never moves.
-    Note that *annotated* tags are meant for release while *lightweight* tags are meant for private or temporary object labels.
+	Note that *annotated* tags are meant for release while *lightweight* tags are meant for private or temporary object labels.
 3. **Remote reference**. A Git **remote** is a repository that contains the same project as you are working on in your local one, but at a different location. A remote is thus nickname for an external repository that you want to interact with and `origin` is the name Git gives to the original repository when you make a copy of (clone) it. Collaborating with others involves managing these remote repositories and pushing and pulling data to and from them when you need to share work.
-    **Remote references** are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with `git ls-remote <remote>`, or `git remote show <remote>` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
-    **Remote-tracking branches** are local references to the state of remote branches. You can't move them; Git moves them for you whenever you do any network communication, to make sure they accurately represent the state of the remote repository. Think of them as bookmarks, to remind you where the branches in your remote repositories were the last time you connected to them. Remote-tracking branch names take the form `<remote>/<branch>`. For instance, if you wanted to see what the master branch on your origin remote looked like as of the last time you communicated with it, you would check the `origin/master` branch.
-    Remote-tracking branches differ from branches (`refs/heads` references) mainly in that they're considered read-only. You can `git checkout` to one, but Git won't point HEAD at one, so you'll never update it with a commit command. Git manages them as bookmarks to the last known state of where those branches were on those servers.
+	**Remote references** are references (pointers) in your remote repositories, including branches, tags, and so on. You can get a full list of remote references explicitly with `git ls-remote <remote>`, or `git remote show <remote>` for remote branches as well as more information. Nevertheless, a more common way is to take advantage of remote-tracking branches.
+	**Remote-tracking branches** are local references to the state of remote branches. You can't move them; Git moves them for you whenever you do any network communication, to make sure they accurately represent the state of the remote repository. Think of them as bookmarks, to remind you where the branches in your remote repositories were the last time you connected to them. Remote-tracking branch names take the form `<remote>/<branch>`. For instance, if you wanted to see what the master branch on your origin remote looked like as of the last time you communicated with it, you would check the `origin/master` branch.
+	Remote-tracking branches differ from branches (`refs/heads` references) mainly in that they're considered read-only. You can `git checkout` to one, but Git won't point `HEAD` at one, so you'll never update it with a commit command. Git manages them as bookmarks to the last known state of where those branches were on those servers.
 
 ### Special Refs
 
-Git keeps a special pointer called **HEAD** (stored in the file `.git/HEAD`) to keep track of the branch that we are currently on (checked out). Usually the **HEAD** file is a symbolic reference i.e. unlike a normal reference, it contains a pointer to another reference.
+Git keeps a special pointer called **HEAD** (stored in the file `.git/HEAD`) to keep track of the branch that we are currently on (checked out). Usually the `HEAD` file is a *symbolic* reference i.e. unlike a normal reference, it contains a pointer to another reference.
 
-However in some rare cases the `HEAD` file may contain the SHA-1 value of a Git object. This happens when you checkout a tag, commit, or remote branch, which puts your repository in "detached HEAD" state. A **detached HEAD** means that `HEAD` is pointing directly to a commit rather than a branch. Any changes that are committed in this state are only remembered as long as you don't switch to a different branch. As soon as you checkout a new branch or tag, the detached commits will be "lost" (because `HEAD` has moved). If you want to save commits done in a detached state, you need to create a branch to remember the commits.
+However in some cases the `HEAD` file may contain the SHA-1 value of a Git object. This happens when you checkout a tag, commit, or remote branch, which puts your repository in "detached HEAD" state. A **detached HEAD** means that `HEAD` is pointing directly to a commit rather than a branch. Any changes that are committed in this state are only remembered as long as you don't switch to a different branch. As soon as you checkout a new branch or tag, the detached commits will be "lost" (because `HEAD` has moved). If you want to save commits done in a detached state, you need to create a branch to remember the commits.
 
 In addition to the `.git/refs/` directory, there are a few special refs that reside in the top-level `.git` directory. For the most part, `HEAD` is the only reference that you'll be using directly. The others are generally only useful when writing lower-level scripts that need to hook into Git's internal workings. These refs are all created and updated by Git when necessary.
 
@@ -98,8 +99,8 @@ Because commit objects always point to a directory tree object (the root directo
 | 6. `@{<n>}`               | `@{1}`                                               |
 | 7. `@{-<n>}   `           | `@{-1}`                                              |
 | 8. `<refname>@{upstream}` | `master@{upstream}, @{u}`                            |
-| 9. `<rev>^`               | `HEAD^, v1.5.1^0`                                    |
-| 10. `<rev>~<n>`           | `master~3`                                           |
+| 9. `<rev>^[<n>]`          | `HEAD^, v1.5.1^0`                                    |
+| 10. `<rev>~[<n>]`         | `HEAD~, master~3`                                    |
 | 11. `<rev>^{<type>}`      | `v0.99.8^{commit}`                                   |
 | 12. `<rev>^{}`            | `v0.99.8^{}`                                         |
 | 13. `<rev>^{/<text>}`     | `HEAD^{/fix nasty bug}`                              |
@@ -109,6 +110,36 @@ Because commit objects always point to a directory tree object (the root directo
 | ----------------- | ------------------------------------------- |
 | 1. `<rev>:<path>` | `HEAD:README`, `:README`, `master:./README` |
 | 2. `:<n>:<path>`  | `:0:README`, `:README`                      |
+
+
+Below is an example illustrating the usage for the `<rev>^[<n>]` and `<rev>~[<n>]` spec. Both commit nodes B and C are parents of commit node A. Parent commits are ordered left-to-right.
+
+```
+G   H   I   J
+ \ /     \ /
+  D   E   F
+   \  |  / \
+    \ | /   |
+     \|/    |
+      B     C
+       \   /
+        \ /
+         A
+
+------------------------------------
+
+A =      = A^0
+B = A^   = A^1     = A~1
+C =      = A^2
+D = A^^  = A^1^1   = A~2
+E = B^2  = A^^2
+F = B^3  = A^^3
+G = A^^^ = A^1^1^1 = A~3
+H = D^2  = B^^2    = A^^^2  = A~2^2
+I = F^   = B^3^    = A^^3^
+J = F^2  = B^3^2   = A^^3^2
+
+```
 
 ## Specifying Ranges
 
@@ -122,7 +153,7 @@ History traversing commands such as `git log` operate on a set of commits, not j
 | 4. `<rev1>...<rev2>`                      | Include commits that are reachable from either `<rev1>` or `<rev2>` but exclude those that are reachable from both. When either `<rev1>` or `<rev2>` is omitted, it defaults to `HEAD`. |
 | 5. `<rev>^@`, e.g. `HEAD^@`               | A suffix `^` followed by an at sign is the same as listing all parents of `<rev>` (meaning, include anything reachable from its parents, but not the commit itself).                    |
 | 6. `<rev>^!`, e.g. `HEAD^!`               | A suffix `^` followed by an exclamation mark is the same as giving commit `<rev>` and then all its parents prefixed with `^` to exclude them (and their ancestors).                     |
-| 7. `<rev>^-<n>`, e.g. `HEAD^-`, `HEAD^-2` | Equivalent to `<rev>^<n>..<rev>`, with `<n> = 1` if not given.                                                                                                                          |
+| 7. `<rev>^-<n>`, e.g. `HEAD^-`, `HEAD^-2` | Equivalent to `<rev>^<n>..<rev>`, with `<n> = 1` if not given.                                                                                          
 
 ## The Reflog
 
@@ -183,9 +214,10 @@ Create an empty Git repository in the specified directory. Running this command 
 git init --bare <directory>
 ```
 
-Initialize an empty Git repository, but omit the working directory. This is called a **bare** repository. Shared repositories should always be created with the `--bare` flag (see discussion below). Conventionally, repositories initialized with the `--bare` flag end in .git.
+Initialize an empty Git repository, but omit the working directory. This is called a **bare** repository. Shared repositories should always be created with the `--bare` flag (see discussion below). Conventionally, repositories initialized with the `--bare` flag end in `.git`.
 
 The `--bare` flag creates a repository that doesn't have a working directory, making it impossible to edit files and commit changes in that repository. You would create a bare repository to `git push` and `git pull` from, but never directly commit to it. Central repositories should always be created as bare repositories because pushing branches to a non-bare repository has the potential to overwrite changes. Think of `--bare` as a way to mark a repository as a storage facility, as opposed to a development environment. This means that for virtually all Git workflows, the central repository is bare, and developers local repositories are non-bare.
+
 
 ### `git clone`
 
@@ -208,8 +240,9 @@ Clone `repo` into the specified `<directory>`.
 #### Common Options
 
 - `--bare`: Similar to `git init --bare`, a copy of the remote repository will be made with an omitted working directory. This means that a repository will be set up with the history of the project that can be pushed and pulled from, but cannot be edited directly. In addition, no remote branches for the repo will be configured with the bare repository. Like `git init --bare`, this is used to create a hosted repository that developers will not edit directly.
-- `--mirror`: Passing the `--mirro`r argument implicitly passes the `--bare` argument as well, resulting in a bare repo with no editable working files. In addition, `--mirror` will clone all the extended refs of the remote repository, and maintain remote branch tracking configuration. You can then run `git remote updat`e on the mirror and it will overwrite all refs from the origin repo, giving you exact 'mirrored' functionality.
-- `-o <name>, --origin <name>`: Instead of using the remote name origin to keep track of the upstream repository, use `<name>`.
+- `--mirror`: Passing the `--mirror` argument implicitly passes the `--bare` argument as well, resulting in a bare repo with no editable working files. In addition, `--mirror` will clone all the extended refs of the remote repository, and maintain remote branch tracking configuration. You can then run `git remote update` on the mirror and it will overwrite all refs from the origin repo, giving you exact 'mirrored' functionality.
+- `-o <name>, --origin <name>`: Instead of using the remote name `origin` to keep track of the upstream repository, use `<name>`.
+
 
 ## Saving Changes
 
@@ -393,7 +426,7 @@ Set the current branch head `HEAD` to `<commit>`, optionally modifying index and
 
 ### `git clean`
 
-Cleans the working tree by recursively removing files that are not under version control, starting from the current directory. While commands like `git reset` and `git checkout`operate on files previously added to the index, the `git clean` command operates on *untracked* files. Untracked files are files that have been created within your repo's working directory but have not yet been added to the repository's tracking index using the `git add` command.
+Cleans the working tree by recursively removing files that are not under version control, starting from the current directory. While commands like `git reset` and `git checkout` operate on files previously added to the index, the `git clean` command operates on *untracked* files. Untracked files are files that have been created within your repo's working directory but have not yet been added to the repository's tracking index using the `git add` command.
 
 #### Common Options
 
@@ -626,7 +659,8 @@ In this case there is not a linear path from the current branch to the target br
 
 #### Two Way Merge
 
-A **2-way merge** or **fast-forward** merge can occur when there is a linear path from the current branch tip to the target branch. Instead of "actually" merging the branches, all Git has to do to integrate the histories is move (i.e., "fast forward") the current branch tip up to the target branch tip. This is the most common case especially when invoked from `git pull`: you are tracking an upstream repository, you have committed no local changes, and now you want to update to a newer upstream revision. This effectively combines the histories, since all of the commits reachable from the target branch are now available through the current one. For example, a fast forward merge of `feature` into `master` using `git merge feature` when on `master` as current branch, would look something like:
+A **2-way merge** or **fast-forward** merge can occur when there is a linear path from the current branch tip to the target branch. Instead of "actually" merging the branches, all Git has to do to integrate the histories is move (i.e., "fast forward") the current branch tip up to the target branch tip. This is the most common case especially when invoked from `git pull`: you are tracking an upstream repository, you have committed no local changes, and now you want to update to a newer upstream revision. This effectively combines the histories, since all of the commits reachable from the target branch are now available through the current one.
+For example, a fast forward merge of `feature` into `master` using `git merge feature` when on `master` as current branch, would look something like:
 
 ![](https://i.imgur.com/GvjzB7N.png)
 
@@ -729,7 +763,7 @@ In Git, there are two main ways to integrate changes from one branch into anothe
 
 Rebasing is the process of moving or combining a sequence of commits to a new base commit. From a content perspective, rebasing is changing the base of your branch from one commit to another making it appear as if you'd created your branch from a different commit. Internally, Git accomplishes this by creating new commits and applying them to the specified base. Note that even though the branch looks the same, it's composed of entirely new commits. 
 
-The primary reason for rebasing is to maintain a linear project history. For example, consider a situation where the master branch has progressed since you started working on a feature branch. You want to get the latest updates to the master branch in your feature branch, but you want to keep your branch's history clean so it appears as if you've been working off the latest master branch. This gives the later benefit of a clean merge of your feature branch back into the master branch.
+The primary reason for rebasing is to maintain a linear project history. For example, consider a situation where the `master` branch has progressed since you started working on a `feature` branch. You want to get the latest updates to the `master` branch in your `feature` branch, but you want to keep your branch's history clean so it appears as if you've been working off the latest `master` branch. This gives the later benefit of a clean merge of your `feature` branch back into the `master` branch.
 
 `git rebase` in standard mode will automatically take the commits in your current working branch and apply them to the head of the passed branch.
 
@@ -842,7 +876,6 @@ A range of commits could also be removed with rebase. If we have the following s
 ```
     E---F---G---H---I---J  topicA
 ```
-
 then the command
 
 ```bash
@@ -892,6 +925,12 @@ git remote [-v | verbose]
 ```
 
 Lists the remote connections you have to other repositories. If `-v` option is included, be a little more verbose and show remote URL after name (this must be placed between `remote` and `subcommand`).
+
+```bash
+git remote show <name>
+```
+
+Gives some information about the remote `<name>`.
 
 The `git remote` command is essentially an interface for managing a list of remote entries that are stored in the repository's `./.git/config` file. The following commands will modify the repo's `/.git/config` file. The result of the following commands can also be achieved by directly editing the `./.git/config` file with a text editor.
 
@@ -1253,7 +1292,7 @@ $ git flow hotfix finish hotfix_branch
 ### Gitflow Summary
 
 The overall flow of Gitflow is:
-
+ 
 1. A `develop` branch is created from `master`.
 2. A `release` branch is created from `develop`.
 3. `feature` branches are created from `develop`.
@@ -1322,3 +1361,4 @@ Some of the most common local and server-side hooks let us plug in to the entire
 <a id="6">[6]</a> [StackOverflow - What does tree-ish mean in Git?](https://stackoverflow.com/questions/4044368/what-does-tree-ish-mean-in-git)
 
 <a id="7">[7]</a> [Dr. Dobbs - Three-Way Merging: A Look Under the Hood](https://www.drdobbs.com/tools/three-way-merging-a-look-under-the-hood/240164902)
+
