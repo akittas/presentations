@@ -1,4 +1,8 @@
+Notes on Git
+
 # Notes on Git
+
+[toc]
 
 # Git Internals
 
@@ -9,21 +13,14 @@ Git **objects** are the actual data of Git, the main thing that the repository i
 There are four object types in Git:
 
 1. **Blob**. In Git, the contents of files are stored as **blobs**. It is important to note that it is the *contents* that are stored, not the files. The names and modes of the files are not stored with the blob, just the contents. Therefore a blob object is nothing but a chunk of binary data. It doesn't refer to anything else or have attributes of any kind, not even a file name.
-
-![](https://i.imgur.com/U8PkBvd.png)
-
+	![](https://i.imgur.com/U8PkBvd.png)
 2. **Tree**. Directories in Git basically correspond to **trees**. A tree is a simple list of trees and blobs that the tree contains, along with the names and modes of those trees and blobs. The contents section of a tree object consists of a simple text file that lists the: i) *mode*, ii) *type*, iii) *name* and iv) *SHA* of each entry.
-
-![](https://i.imgur.com/Sa5cA9i.png)
-
+	![](https://i.imgur.com/Sa5cA9i.png)
 3. **Commit**. The **commit** object is very simple, much like the tree. It simply points to a tree and keeps: i) *tree* ii) *author*, iii) *committer*, iv) *message* and v) any *parent commits* that directly preceded it. Most times a commit will only have a single parent but e.g. if you merge two branches, the next commit will point to both of them.
-
-![](https://i.imgur.com/dgbdfRB.png)
-
-4. **Tag (annotated)**. The annotated **tag** is an object that provides a permanent shorthand name for a particular commit. It contains an i) *object*, ii) *type*, iii) *tag name*, iv) *tagger* and v) *message*. Normally the type is commit and the object is the SHA-1 of the commit you 're tagging. This tag can also be GPG signed, providing cryptographic integrity to a release or version. Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
-
-![](https://i.imgur.com/brljv1N.png)
-
+	![](https://i.imgur.com/dgbdfRB.png)
+4. **Tag (annotated)**. The annotated **tag** is an object that provides a permanent shorthand name for a particular commit. It contains an i) *object*, ii) *type*, iii) *tag name*, iv) *tagger* and v) *message*. Normally the type is commit and the object is the SHA-1 of the commit you 're tagging. This tag can also be GPG signed, providing cryptographic integrity to a release or version.
+	Note that *annotated* tags are different from *lightweight* tags (see [Git References](#git-references)).
+   ![](https://i.imgur.com/brljv1N.png)
 
 ## Git References
 
@@ -719,6 +716,49 @@ Comparing the two files side by side, we can see that there are three lines with
 - The conflict on line 70 can also be automatically solved to "mine" (destination contributor) because it is clear now that the line has been added and it wasn't there before.
 - The conflict on line 51 needs manual resolution: You need to decide whether you want to keep one of the contributors, the other, or even modify it manually.
 
+### `git tag` 
+
+Git has the ability to tag specific points in a repository's history as being important. Typically, people use this functionality to mark release points (v1.0, v2.0 and so on). Git supports two types of tags: **lightweight** and **annotated**.
+
+A lightweight tag is very much like a branch that doesn't change - it's just a pointer to a specific commit. Annotated tags, however, are stored as full objects in the Git database. They're checksummed; contain the tagger name, email, and date; have a tagging message; and can be signed and verified with GPG. It's generally recommended that you create annotated tags so you can have all this information; but if you want a temporary tag or for some reason don't want to keep the other information, lightweight tags are available too.
+
+```bash
+git tag
+git tag [-l | --list]
+```
+
+Either of these two commands will list all tags. You can also search for tags that match a particular pattern. If e.g. you're interested only in looking at the 1.8.5 series, you can run:
+
+```bash
+git tag -l "v1.8.5*"
+```
+
+Note that running the command `git tag` implicitly assumes you want a listing and provides one; the use of `-l` or `--list` in this case is optional. If, however, you're supplying a wildcard pattern to match tag names, the use of `-l` or `--list` is mandatory.
+
+```bash
+git tag v1.4
+```
+
+To create a lightweight tag, don't supply any of the `-a`, `-s`, or `-m` options, just provide a tag name as above.
+
+```bash
+git tag -a v1.4 -m "my version 1.4"
+```
+
+To create an annotated tag, specify `-a` when you run the tag command. The `-m` specifies a tagging message, which is stored with the tag. If you don't specify a message for an annotated tag, Git launches your editor so you can type it in.
+
+```bash
+git tag -a v1.2 9fceb02
+```
+
+We can also tag commits, as above, by supplying the commit hash.
+
+```bash
+git tag -d v1.4
+```
+
+To delete a tag use the `-d` option.
+
 ## Rewriting History
 
 ### `git reflog`
@@ -947,8 +987,8 @@ Create a new connection to a remote repository. After adding a remote, you'll be
 - `-m <master>`: A symbolic-ref `refs/remotes/<name>/HEAD` is set up to point at remote's `<master>` branch. See also the `set-head` command.
 
 ```bash
-git remote rm name
-git remote remove name
+git remote rm <name>
+git remote remove <name>
 ```
 
 Remove the remote named `<name>`. All remote-tracking branches and configuration settings for the remote are removed.
@@ -1066,9 +1106,7 @@ The `--force` flag (see also below) overrides this behavior and makes the remote
 git push [<options>] [<repository> [<refspec>...]]
 ```
 
-When the command line does not specify where to push with the `<repository>` argument, `branch.*.remote` configuration for the current branch is consulted to determine where to push. If the configuration is missing, it defaults to `origin`.
-
-When the command line does not specify what to push with `<refspec>...` arguments or `--all`, `--mirror`, `--tags` options, the command finds the default `<refspec>` by consulting `remote.*.push` configuration, and if it is not found, honors `push.default` configuration to decide what to push.
+When the command line does not specify where to push with the `<repository>` argument, `branch.*.remote` configuration for the current branch is consulted to determine where to push. If the configuration is missing, it defaults to `origin`. When the command line does not specify what to push with `<refspec>...` arguments or `--all`, `--mirror`, `--tags` options, the command finds the default `<refspec>` by consulting `remote.*.push` configuration, and if it is not found, honors `push.default` configuration to decide what to push.
 
 ```bash
 git push <remote> <branch>
@@ -1080,19 +1118,31 @@ Push the specified branch to `<remote>`, along with all of the necessary commits
 git push <remote> [-f | --force]
 ```
 
-Same as the above command, but force the push even if it results in a non-fast-forward merge. Do not use the `--force` flag unless you’re absolutely sure you know what you're doing.
+Same as the above command, but force the push even if it results in a non-fast-forward merge. Do not use the `--force` flag unless you're absolutely sure you know what you're doing.
+
+```bash
+git push <remote> [-u | --set-upstream]
+```
+
+For every branch that is up to date or successfully pushed, add upstream (tracking) reference, used by argument-less `git pull` and other commands.
 
 ```bash
 git push <remote> --all
 ```
 
-Push all of your local branches to the specified remote.
+Push all of your local branches  (i.e. refs under `refs/heads/`) to the specified remote.
 
 ```bash
 git push <remote> --tags
 ```
 
 Tags are not automatically pushed when you push a branch or use the `--all` option. The `--tags` flag sends all of your local tags to the remote repository.
+
+```bash
+git push <remote> --mirror
+```
+
+Instead of naming each ref to push, specifies that all refs under `refs/` (which includes but is not limited to `refs/heads/`, `refs/remotes/`, and `refs/tags/`) be mirrored to the remote repository. Newly created local refs will be pushed to the remote end, locally updated refs will be force updated on the remote end, and deleted refs will be removed from the remote end.
 
 Sometimes branches need to be cleaned up for book keeping or organizational purposes. The fully delete a branch, it must be deleted locally and also remotely.
 
@@ -1101,7 +1151,7 @@ git branch -D branch_name
 git push origin :branch_name
 ```
 
-The above will delete the remote branch named `branch_name` passing a branch name prefixed with a colon to `git push` will delete the remote branch.
+The above will delete the remote branch named `branch_name` and passing a branch name prefixed with a colon to `git push` will delete the remote branch.
 
 #### Refspecs
 
@@ -1131,7 +1181,7 @@ fetch = +refs/heads/*:refs/remotes/origin/*
 
 ```
 
-The fetch line tells git fetch to download all of the branches from the `origin` repo. But, some workflows don't need all of them. For example, many continuous integration workflows only care about the master branch. To fetch only the master branch, change the fetch line to match the following:
+The fetch line tells `git fetch` to download all of the branches from the `origin` repo. But, some workflows don't need all of them. For example, many continuous integration workflows only care about the master branch. To fetch only the master branch, change the fetch line to match the following:
 
 ```bash
 [remote "origin"]
@@ -1152,7 +1202,7 @@ Refspecs give you complete control over how various Git commands transfer branch
 
 ## Gitflow Workflow
 
-A Git Workflow is a recipe or recommendation for how to use Git to accomplish work in a consistent and productive manner. Git workflows encourage users to leverage Git effectively and consistently. Git offers a lot of flexibility in how users manage changes. Given Git's focus on flexibility, there is no standardized process on how to interact with Git. When working with a team on a Git managed project, it’s important to make sure the team is all in agreement on how the flow of changes will be applied. To ensure the team is on the same page, an agreed upon Git workflow should be developed or selected.
+A Git Workflow is a recipe or recommendation for how to use Git to accomplish work in a consistent and productive manner. Git workflows encourage users to leverage Git effectively and consistently. Git offers a lot of flexibility in how users manage changes. Given Git's focus on flexibility, there is no standardized process on how to interact with Git. When working with a team on a Git managed project, it's important to make sure the team is all in agreement on how the flow of changes will be applied. To ensure the team is on the same page, an agreed upon Git workflow should be developed or selected.
 
 The Gitflow Workflow defines a strict branching model designed around the project release. This provides a robust framework for managing larger projects.
 
@@ -1349,16 +1399,9 @@ Some of the most common local and server-side hooks let us plug in to the entire
 ## References
 
 <a id="1">[1]</a> [S. Chacon - Git Internals](https://github.com/pluralsight/git-internals-pdf) (2008)
-
 <a id="2">[2]</a> [S. Chacon - The Git Community Book](https://shafiul.github.io/gitbook)
-
 <a id="3">[3]</a> [S. Chacon & B. Straub - Pro Git](https://git-scm.com/book/en/v2)
-
 <a id="4">[4]</a> [Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials)
-
 <a id="5">[5]</a> [Git Official Documentation](https://git-scm.com/docs)
-
 <a id="6">[6]</a> [StackOverflow - What does tree-ish mean in Git?](https://stackoverflow.com/questions/4044368/what-does-tree-ish-mean-in-git)
-
 <a id="7">[7]</a> [Dr. Dobbs - Three-Way Merging: A Look Under the Hood](https://www.drdobbs.com/tools/three-way-merging-a-look-under-the-hood/240164902)
-
