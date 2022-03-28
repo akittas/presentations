@@ -1,7 +1,3 @@
-Notes on Git
-
-# Notes on Git
-
 [toc]
 
 # Git Internals
@@ -187,6 +183,25 @@ git checkout HEAD@{1}
 
 This puts you in a detached `HEAD` state. From here, you can create a new branch and continue working on your feature.
 
+## Git Configuration
+
+You can specify Git configuration settings with the `git config` command, e.g. to set up your name and email address:
+
+```bash
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+```
+
+First, a quick review: Git uses a series of configuration files to determine non-default behavior that you may want. The first place Git looks for these values is in the system-wide `[path]/etc/gitconfig` file, which contains settings that are applied to every user on the system and all of their repositories. If you pass the option `--system` to `git config`, it reads and writes from this file specifically.
+
+The next place Git looks is the `~/.gitconfig` (or `~/.config/git/config`) file, which is specific to each user. You can make Git read and write to this file by passing the `--global` option.
+
+Finally, Git looks for configuration values in the configuration file in the Git directory (`.git/config`) of whatever repository you’re currently using. These values are specific to that single repository, and represent passing the `--local` option to `git config`. If you don't specify which level you want to work with, this is the default.
+
+Each of these "levels" (*system*, *global*, *local*) overwrites values in the previous level, so values in `.git/config` trump those in `[path]/etc/gitconfig`, for instance.
+
+> Note: Git’s configuration files are plain-text, so you can also set these values by manually editing the file and inserting the correct syntax. It’s generally easier to run the `git config` command, though.
+
 # Git Commands
 
 ## Setting Up a Repository
@@ -215,7 +230,6 @@ Initialize an empty Git repository, but omit the working directory. This is call
 
 The `--bare` flag creates a repository that doesn't have a working directory, making it impossible to edit files and commit changes in that repository. You would create a bare repository to `git push` and `git pull` from, but never directly commit to it. Central repositories should always be created as bare repositories because pushing branches to a non-bare repository has the potential to overwrite changes. Think of `--bare` as a way to mark a repository as a storage facility, as opposed to a development environment. This means that for virtually all Git workflows, the central repository is bare, and developers local repositories are non-bare.
 
-
 ### `git clone`
 
 `git clone` is primarily used to point to an existing repo and make a clone or copy of that repo at in a new directory, at another location. The original repository can be located on the local filesystem or on remote machine accessible supported protocols. This command lones a repository into a newly created directory, creates remote-tracking branches for each branch in the cloned repository (visible using `git branch --remotes`), and creates and checks out an initial branch that is forked from the cloned repository's currently active branch.
@@ -239,7 +253,6 @@ Clone `repo` into the specified `<directory>`.
 - `--bare`: Similar to `git init --bare`, a copy of the remote repository will be made with an omitted working directory. This means that a repository will be set up with the history of the project that can be pushed and pulled from, but cannot be edited directly. In addition, no remote branches for the repo will be configured with the bare repository. Like `git init --bare`, this is used to create a hosted repository that developers will not edit directly.
 - `--mirror`: Passing the `--mirror` argument implicitly passes the `--bare` argument as well, resulting in a bare repo with no editable working files. In addition, `--mirror` will clone all the extended refs of the remote repository, and maintain remote branch tracking configuration. You can then run `git remote update` on the mirror and it will overwrite all refs from the origin repo, giving you exact 'mirrored' functionality.
 - `-o <name>, --origin <name>`: Instead of using the remote name `origin` to keep track of the upstream repository, use `<name>`.
-
 
 ## Saving Changes
 
@@ -519,6 +532,8 @@ git branch -D <branchname>
 - `-d, --delete`: Delete the specified branch. This is a "safe" operation in that Git prevents you from deleting the branch if it has unmerged changes.
 - `-D`: Force delete the specified branch, even if it has unmerged changes. This is the command to use if you want to permanently throw away all of the commits associated with a particular line of development.
 
+**Note**: To delete a remote branch, use `git push -d` (see [`git push`](#git-push)).
+
 ```bash
 git branch [-m | --move] [<oldbranch>] <newbranch>
 git branch -M [<oldbranch>] <newbranch>
@@ -556,16 +571,26 @@ For example, when we clone a repository Git's clone command automatically names 
 3. The `master` remote branch (or upstream branch) which is located in the remote repository.
 
 ```bash
-git branch <branchname> --track <remote>/<branchname>
+git branch <branchname> [-t | --track ] <remote>/<branchname>
 ```
 
-When creating a new branch, set up `branch.<name>.remote` and `branch.<name>.merge` configuration entries to mark the start-point branch as "upstream" from the new branch. This configuration will tell Git to show the relationship between the two branches in `git status` and `git branch -v`. Furthermore, it directs `git pull` without arguments to pull from the upstream when the new branch is checked out. You would use `--track` when you create a new branch to track an existing remote branch. If no `<branchname>` is specified, then it defaults to the current branch.
+When creating a new branch, set up `branch.<name>.remote` and `branch.<name>.merge` configuration entries to mark the start-point branch as "upstream" from the new branch. This configuration will tell Git to show the relationship between the two branches in `git status` and `git branch -v`. Furthermore, it directs `git pull` without arguments to pull from the upstream when the new branch is checked out.
+
+**Note**: Use `-t` when you create a **new** branch to track an **existing** (local/remote) branch.
 
 ```bash
 git branch <branchname> [-u <upstream> | --set-upstream-to=<upstream>]
 ```
 
 Set up an existing `<branchname>`'s tracking information so `<upstream>` is considered `<branchname>`'s upstream branch. If no `<branchname>` is specified, then it defaults to the current branch. Both switches (`--track` and `set-upstream-to`) can also be used to track local branches.
+
+**Note**: Use `-u` when you want to set an **existing** branch to track an **existing** (local/remote) branch. To setup tracking for an **existing** branch to **new** remote branch, use `git push -u` (see [`git push`](#git-push)).
+ 
+```bash
+git branch <branchname> --unset-upstream
+```
+
+Remove the upstream information for ``<branchname>``. If no branch is specified it defaults to the current branch.
 
 Τo operate further on the resulting branches the `git branch` command is commonly used with other commands like `git checkout`, `git switch` and `git merge`. Note that the `-f` or `--force` switch can be used to force creation, move/rename, deletion of branches and can also be used with `git checkout` and `git switch`. 
 
@@ -595,7 +620,7 @@ git checkout -b <new-branch> <existing-branch>
 By default, `git checkout -b` will base the `<new-branch>` off the current `HEAD`. In the above example, `<existing-branch>` is passed which then bases `<new-branch>` off of `<existing-branch>` instead of the current `HEAD`. Instead of `<existing-branch>`, any commit SHA-1 can be used to base off the new branch.
 
 ```bash
-git checkout -b <branch> --track <remote>/<branch>
+git checkout -b <branch> [-t | --track] <remote>/<branch>
 ```
 
 When creating a new branch, set up "upstream" configuration (see `--track` in [`git branch`](#git-branch)). When executing `git checkout <branch>`, if `<branch>` is not found but there does exist a tracking branch in exactly one remote (call it `<remote>`) with a matching name and `--no-guess` is not specified, treat as equivalent to the above command.
@@ -1121,10 +1146,28 @@ git push <remote> [-f | --force]
 Same as the above command, but force the push even if it results in a non-fast-forward merge. Do not use the `--force` flag unless you're absolutely sure you know what you're doing.
 
 ```bash
+git push <remote> [-d | --delete] <branchname>
+git push <remote> :<branchname>
+```
+
+Delete the remote branch. Instead of `<branchname>`, a tag or other ref may be used and will be deleted in the remote repository. As seen in above example, this is the same as prefixing all refs with a colon.
+
+Sometimes branches need to be cleaned up for book keeping or organizational purposes. The fully delete a branch, it must be deleted locally and also remotely.
+
+```bash
+git branch -d branch_name
+git push origin :branch_name
+```
+
+The above will delete the remote branch named `branch_name` and passing a branch name prefixed with a colon to `git push` will delete the remote branch.
+
+```bash
 git push <remote> [-u | --set-upstream]
 ```
 
 For every branch that is up to date or successfully pushed, add upstream (tracking) reference, used by argument-less `git pull` and other commands.
+
+**Note**: Use `git push -u` when you want to set an **existing** branch to track an **new** remote branch.
 
 ```bash
 git push <remote> --all
@@ -1143,15 +1186,6 @@ git push <remote> --mirror
 ```
 
 Instead of naming each ref to push, specifies that all refs under `refs/` (which includes but is not limited to `refs/heads/`, `refs/remotes/`, and `refs/tags/`) be mirrored to the remote repository. Newly created local refs will be pushed to the remote end, locally updated refs will be force updated on the remote end, and deleted refs will be removed from the remote end.
-
-Sometimes branches need to be cleaned up for book keeping or organizational purposes. The fully delete a branch, it must be deleted locally and also remotely.
-
-```bash
-git branch -D branch_name
-git push origin :branch_name
-```
-
-The above will delete the remote branch named `branch_name` and passing a branch name prefixed with a colon to `git push` will delete the remote branch.
 
 #### Refspecs
 
@@ -1252,14 +1286,14 @@ When you're done with the development work on the feature, the next step is to m
 
 Without the `git-flow` extension:
 
-```
+```bash
 git checkout develop
 git merge feature_branch
 ```
 
 Using the `git-flow` extension:
 
-```
+```bash
 git flow feature finish feature_branch
 ```
 
@@ -1405,3 +1439,22 @@ Some of the most common local and server-side hooks let us plug in to the entire
 <a id="5">[5]</a> [Git Official Documentation](https://git-scm.com/docs)
 <a id="6">[6]</a> [StackOverflow - What does tree-ish mean in Git?](https://stackoverflow.com/questions/4044368/what-does-tree-ish-mean-in-git)
 <a id="7">[7]</a> [Dr. Dobbs - Three-Way Merging: A Look Under the Hood](https://www.drdobbs.com/tools/three-way-merging-a-look-under-the-hood/240164902)
+
+# Git Development Conventions
+
+## Naming branches
+
+We name branches in a specific way, in form of `<branch_type>/<branch_name>`, e.g. `fix/encoding-errors`. Following is the list of branch types and correspondence to issue labels.
+
+
+| Branch Type  | Label |
+| ---- | ---- |
+| docs | documentation |
+| enhc | enhancement |
+| feat | feature |
+| fix | bug |
+| ops | ops |
+| refc | refactoring |
+| tests | testing |
+| tools  | tooling |
+
